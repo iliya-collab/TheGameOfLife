@@ -126,7 +126,7 @@ void process_next_generation(char** current, char** next, int rows, int cols, in
 void print_current_generation(char** current, int rows, int cols, int alive_cells, int generation)
 {
     sleep(1);
-    //std::system("cls");
+    std::system("cls");
     print_gb(current, rows, cols);
     print_stats(alive_cells, generation);
 }
@@ -135,6 +135,7 @@ int game_loop(char** gb, int rows, int cols, int alive_cells)
 {
     char** save_gb = init_gb(rows, cols);
     char** next_gb = init_gb(rows, cols);
+    fill_gb(next_gb, rows, cols);
     bool isGameOver = false;
     int generation = 1;
 
