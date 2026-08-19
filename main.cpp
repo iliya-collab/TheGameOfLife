@@ -94,7 +94,6 @@ int number_alive_cells(char** gb, int row, int col, int left, int right, int up,
 
 void process_next_generation(char** current, char** next, int rows, int cols, int& alive_cells)
 {
-    alive_cells = 0;
     for (int i = 0; i < rows; i++)
         for (int j = 0; j < cols; j++)
         {
@@ -127,7 +126,7 @@ void process_next_generation(char** current, char** next, int rows, int cols, in
 void print_current_generation(char** current, int rows, int cols, int alive_cells, int generation)
 {
     sleep(1);
-    std::system("cls");
+    //std::system("cls");
     print_gb(current, rows, cols);
     print_stats(alive_cells, generation);
 }
@@ -135,8 +134,12 @@ void print_current_generation(char** current, int rows, int cols, int alive_cell
 int game_loop(char** gb, int rows, int cols, int alive_cells)
 {
     char** save_gb = init_gb(rows, cols);
+    char** next_gb = init_gb(rows, cols);
     bool isGameOver = false;
     int generation = 1;
+
+    // Выводим начальное состояние
+    print_current_generation(gb, rows, cols, alive_cells, generation);
 
     while (!isGameOver)
     {
@@ -145,27 +148,31 @@ int game_loop(char** gb, int rows, int cols, int alive_cells)
 
         // Обработка следующего поколения
         generation++;
-        process_next_generation(save_gb, gb, rows, cols, alive_cells);
-
+        alive_cells = 0;
+        process_next_generation(gb, next_gb, rows, cols, alive_cells);
         
         if (alive_cells == 0) 
         {
-            print_current_generation(gb, rows, cols, alive_cells, generation);
+            print_current_generation(next_gb, rows, cols, alive_cells, generation);
             std::cout << "All cells are dead. Game over" << std::endl;
             isGameOver = true;
         }
-        else if (is_stable_generation(gb, save_gb, rows, cols))
+        else if (is_stable_generation(save_gb, next_gb, rows, cols))
         {
-            print_current_generation(gb, rows, cols, alive_cells, generation);
+            print_current_generation(next_gb, rows, cols, alive_cells, generation);
             std::cout << "The world has stagnated. Game over" << std::endl;
             isGameOver = true;
         }
         else // Продолжаем
         {
+            save_generation(next_gb, gb, rows, cols);
             // Вывод текущего поколения
             print_current_generation(gb, rows, cols, alive_cells, generation);
         }
     }
+
+    free_gb(save_gb, rows);
+    free_gb(next_gb, rows);
 
     return EXIT_SUCCESS;
 }
